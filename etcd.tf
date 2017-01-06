@@ -1,0 +1,40 @@
+resource "aws_autoscaling_group" "etcd" {
+  vpc_zone_identifier       = ["${aws_subnet.k8-etcd-subnet-zone01.id}","${aws_subnet.k8-etcd-subnet-zone02.id}"]
+  name                      = "k8-etcd-asg-${var.cluster_name}"
+  max_size                  = 5
+  min_size                  = "${var.etcd_node_count}"
+  health_check_grace_period = 300
+  health_check_type         = "EC2"
+  desired_capacity          = "${var.etcd_node_count}"
+  force_delete              = false
+  launch_configuration      = "${aws_launch_configuration.etcd.name}"
+  tags {
+    key = "Name"
+    value = "k8-etcd-asg-${var.cluster_name}"
+    propagate_at_launch = true
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+resource "aws_launch_configuration" "etcd" {
+  name                 = "k8-etcd-lc-${var.cluster_name}"
+  image_id             = "${var.core_ami}"
+  instance_type        = "${var.etcd_ins_type}"
+  key_name             = "${var.key_name}"
+  security_groups      = ["${aws_security_group.k8-etcd-sg.id}"]
+  user_data            = "${file("${path.module}/files/user-data-etcd")}"
+  iam_instance_profile = "${aws_iam_instance_profile.master.id}"
+
+
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [
+    "aws_iam_policy_attachment.etcd"
+    "aws_iam_policy.nat"
+    "aws_security_group.k8-etcd-sg"
+  ]
+}
