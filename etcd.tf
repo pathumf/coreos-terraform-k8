@@ -21,7 +21,7 @@ resource "aws_launch_configuration" "etcd" {
   instance_type        = "${var.etcd_ins_type}"
   key_name             = "${var.key_name}"
   security_groups      = ["${aws_security_group.k8-security-group-etcd.id}"]
-  user_data            = "${file("${path.module}/files/user-data-etcd")}"
+  user_data            = "${file("${path.module}/files/etcd-userdata.yml")}"
   iam_instance_profile = "${aws_iam_instance_profile.master.id}"
 
 
