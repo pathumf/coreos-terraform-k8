@@ -15,6 +15,12 @@ write-files:
           sleep 1 && echo .;
         done;
       exit $?
+  - path: /tmp/set-info.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      echo PRIVATE_IP=$COREOS_PRIVATE_IPV4 >> /etc/kubernetes.env
+      echo PUBLIC_IP=$COREOS_PUBLIC_IPV4 >> /etc/kubernetes.env
   - path: /tmp/master.sh
     permission: '0755'
     content: |
@@ -267,5 +273,22 @@ coreos:
       RestartSec=10
       [Install]
       WantedBy=multi-user.target
+  - name: set-instance-info.service
+    content: |
+      [Unit]
+      Description=Set instance information
+      [Service]
+      Type=oneshot
+      EnvironmentFile=/etc/kubernetes.env
+      ExecStart=/usr/bin/bash -c /tmp/set-info.sh
+  - name: master-setup.service
+    content: |
+      [Unit]
+      Requires=setipinfo.service
+      After=setipinfo.service
+      [Service]
+      Type=oneshot
+      EnvironmentFile=/etc/kubernetes.env
+      ExecStart=/usr/bin/bash -c /tmp/master.sh
   update:
     reboot-strategy: "off"
