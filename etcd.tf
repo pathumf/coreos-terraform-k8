@@ -29,3 +29,37 @@ resource "aws_launch_configuration" "etcd" {
     create_before_destroy = true
   }
 }
+
+#etcd loadbalancer
+resource "aws_elb" "etcd-elb" {
+  name = "k8-etcd-elb-${var.cluster_name}"
+
+  # The same availability zone as our instances
+  availability_zones = ["${split(",", var.availability_zones)}"]
+  internal = "true"
+
+  listener {
+    instance_port     = 2379
+    instance_protocol = "http"
+    lb_port           = 2379
+    lb_protocol       = "http"
+  }
+
+  listener {
+    instance_port     = 2380
+    instance_protocol = "http"
+    lb_port           = 2380
+    lb_protocol       = "http"
+  }
+
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "TCP:2379"
+    interval            = 30
+  }
+
+}
+
