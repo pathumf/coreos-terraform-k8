@@ -1,41 +1,25 @@
-/*=== NAT INSTANCE ASG ===*/
-resource "aws_autoscaling_group" "nat" {
-    name                      = "nat-asg-${var.cluster_name}"
-    vpc_zone_identifier       = "${aws_subnet.k8-master-subnet}"
-    max_size                  = 1
-    min_size                  = 1
-    health_check_grace_period = 60
-    default_cooldown          = 60
-    health_check_type         = "EC2"
-    desired_capacity          = 1
-    force_delete              = false
-    launch_configuration      = "${aws_launch_configuration.nat.name}"
-    tag {
-      key                 = "Name"
-      value               = "nat-${var.cluster_name}"
-      propagate_at_launch = true
-    }
+resource "aws_instance" "nat" {
+ ami                         = "${var.nat_ami}"
+ instance_type               = "m3.medium"
+ key_name                    = "${var.key_name}"
+ vpc_security_group_ids      = ["${aws_security_group.k8-security-group-master.id}"]
+ subnet_id                   = "${aws_subnet.k8-master-subnet.id}"
+ associate_public_ip_address = true
+ source_dest_check           = false
 
-   lifecycle {
-      create_before_destroy = true
-    }
+ root_block_device {
+   volume_type           = "gp2"
+   volume_size           = "8"
+   delete_on_termination = true
+ }
+
+ tags {
+   Name        = "vpc-nat-${var.cluster_name}"
+ }
 }
 
-resource "aws_launch_configuration" "nat" {
-    name                        = "${var.cluster_name}-k8-nat-lc"
-    image_id                    = "${var.nat_ami}"
-    instance_type               = "${var.nat_ins_type}"
-    iam_instance_profile        = "${aws_iam_instance_profile.nat.name}"
-    key_name                    = "${var.key_name}"
-    security_groups             = ["${aws_security_group.k8-master-sg.id}"]
-    associate_public_ip_address = true
-    sorce_dest_check            = false
-    lifecycle {
-      create_before_destroy = true
-    }
-    depends_on = [
-      "aws_iam_policy_attachment.nat"
-      "aws_iam_role_policy.nat"
-      "aws_security_group.k8-master-sg"
-    ]
+/* Elastic IPs*/
+resource "aws_eip" "nat" {
+ instance = "${aws_instance.nat.id}"
+ vpc      = true
 }

@@ -1,4 +1,4 @@
-resource "aws_autoscaling_group" "etcd" {
+resource "aws_autoscaling_group" "master" {
   vpc_zone_identifier       = "${aws_subnet.k8-master-subnet.id}"
   name                      = "k8-master-asg-${var.cluster_name}"
   max_size                  = 3
@@ -24,7 +24,7 @@ resource "aws_launch_configuration" "master" {
   image_id             = "${var.core_ami}"
   instance_type        = "${var.master_ins_type}"
   key_name             = "${var.key_name}"
-  security_groups      = ["${aws_security_group.k8-master-sg.id}"]
+  security_groups      = ["${aws_security_group.k8-security-group-master.id}"]
   user_data            = "${file("${path.module}/files/user-data-master")}"
   iam_instance_profile = "${aws_iam_instance_profile.master.id}"
 
@@ -32,9 +32,4 @@ resource "aws_launch_configuration" "master" {
   lifecycle {
     create_before_destroy = true
   }
-  depends_on = [
-    "aws_iam_policy_attachment.master"
-    "aws_iam_policy.master"
-    "aws_security_group.k8-master-sg"
-  ]
 }

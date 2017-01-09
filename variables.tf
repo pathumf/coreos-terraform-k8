@@ -1,69 +1,74 @@
-variable "access_key" {}
-variable "secret_key" {}
-
 variable "region" {
-  default = ""
+  default = "eu-central-1"
 }
 variable "cidr_vpc_block" {
-  default = ""
+  default = "10.0.0.0/16"
 }
 variable "az_list_all" {
-  default = ""
+  default = "eu-central-1a,eu-central-1b"
 }                                                            
 variable "cluster_name" {
-  default = ""
+  default = "kube-cluster"
 }
 variable "cidr_block_master" {
-  default = ""
+  default = "10.0.1.0/24"
 }
 variable "az_master_zone" {
-  default = ""
+  default = "eu-central-1a"
 }
 variable "cidr_block_etcd" {
-  default = ""
+  default = "10.0.2.0/24"
 }
 variable "cidr_block_worker_zone01" {
-  default = ""
+  default = "10.0.3.0/24"
 }
 variable "cidr_block_worker_zone02" {
-  default = ""
+  default = "10.0.4.0/24"
 }
 variable "az_worker_zone01" {
-  default = ""
+  default = "10.0.5.0/24"
 }
 variable "az_worker_zone02" {
-  default = ""
+  default = "10.0.6.0/24"
 }
 variable "az_count" {
-  default = ""
+  default = "2"
 }
 variable "nat_ami" {
-  default = ""
+  default = "ami-0b322e67"
 }
 variable "nat_ins_type" {
-  default = ""
+  default = "t2.micro"
 }
 variable "etcd_node_count" {
-  default = ""
+  default = "3"
 }
+
+variable "etcd_ins_type" {
+  default="t2.micro"
+}
+
 variable "core_ami" {
-  default = ""
+  default = "ami-ed0ec882"
 }
 variable "master_node_count" {
-  default = ""
+  default = "1"
 }
 variable "master_ins_type" {
-  default = ""
+  default = "t2.micro"
 }
 variable "worker_node_count" {
-  default = ""
+  default = "3"
 }
 variable "worker_ins_type" {
-  default = ""
+  default = "t2.micro"
 }
 variable "az_etcd_zone1" {
-  default = ""
+  default = "eu-central-1a"
 }
 variable "az_etcd_zone2" {
-  default = ""
+  default = "eu-central-1b"
+}
+variable "key_name" {
+  default="BiteSize"
 }
