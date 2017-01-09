@@ -8,11 +8,7 @@ resource "aws_autoscaling_group" "worker" {
   desired_capacity          = "${var.worker_node_count}"
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.worker.name}"
-  tags {
-    key = "Name"
-    value = "k8-worker-asg-${var.cluster_name}"
-    propagate_at_launch = true
-  }
+
   lifecycle {
     create_before_destroy = true
   }

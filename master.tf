@@ -1,5 +1,5 @@
 resource "aws_autoscaling_group" "master" {
-  vpc_zone_identifier       = "${aws_subnet.k8-master-subnet.id}"
+  vpc_zone_identifier       = ["${aws_subnet.k8-master-subnet.id}"]
   name                      = "k8-master-asg-${var.cluster_name}"
   max_size                  = 3
   min_size                  = "${var.master_node_count}"
@@ -8,11 +8,7 @@ resource "aws_autoscaling_group" "master" {
   desired_capacity          = "${var.master_node_count}"
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.master.name}"
-  tags {
-    key = "Name"
-    value = "k8-master-asg-${var.cluster_name}"
-    propagate_at_launch = true
-  }
+
   lifecycle {
     create_before_destroy = true
   }
