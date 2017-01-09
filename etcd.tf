@@ -35,7 +35,7 @@ resource "aws_elb" "etcd-elb" {
   name = "k8-etcd-elb-${var.cluster_name}"
 
   # The same availability zone as our instances
-  availability_zones = ["${split(",", var.availability_zones)}"]
+  availability_zones = ["${split(",", var.az_list_all)}"]
   internal = "true"
 
   listener {
