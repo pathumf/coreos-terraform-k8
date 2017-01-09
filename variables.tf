@@ -74,11 +74,14 @@ variable "key_name" {
 }
 
 variable "kubernetes_version" {
-  default = ""
+  default = "1.2.2"
 }
 variable "service_ip_range" {
-  default = ""
+  default = "10.5.0.0/16"
 }
 variable "api_secure_port" {
-  default = ""
+  default = "443"
+}
+variable "dns_service_ip" {
+  default = "10.5.0.10"
 }
