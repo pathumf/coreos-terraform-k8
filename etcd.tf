@@ -8,6 +8,7 @@ resource "aws_autoscaling_group" "etcd" {
   desired_capacity          = "${var.etcd_node_count}"
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.etcd.name}"
+  load_balancers            = ["${aws_elb.etcd-elb.name}"]
   
   lifecycle {
     create_before_destroy = true
