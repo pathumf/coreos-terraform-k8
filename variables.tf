@@ -6,7 +6,7 @@ variable "cidr_vpc_block" {
 }
 variable "az_list_all" {
   default = "eu-central-1a,eu-central-1b"
-}                                                            
+}
 variable "cluster_name" {
   default = "kube-cluster"
 }
@@ -71,4 +71,14 @@ variable "az_etcd_zone2" {
 }
 variable "key_name" {
   default="BiteSize"
+}
+
+variable "kubernetes_version" {
+  default = ""
+}
+variable "service_ip_range" {
+  default = ""
+}
+variable "api_secure_port" {
+  default = ""
 }
