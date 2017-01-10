@@ -86,3 +86,6 @@ variable "dns_service_ip" {
 variable "s3_bucket" {
   default = "k8tlsbackect"
 }
+variable "pod_network" {
+    default = "10.2.0.0/16"
+}

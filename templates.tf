@@ -10,6 +10,7 @@ resource "template_file" "master-user-data" {
   template = "${file("files/master-userdata.yml")}"
   vars  {
     KUBERNETES_VERSION = "${var.kubernetes_version}"
+    KUBERNETES_CONTAINERS_CIDR = "${var.pod_network}"
     FLANNELD_ETCD_ENDPOINTS = "http://${aws_elb.etcd-elb.dns_name}:2379"
     ETCD_ENDPOINTS = "http://${aws_elb.etcd-elb.dns_name}:2379"
     SERVICE_IP_RANGE = "${var.service_ip_range}"
