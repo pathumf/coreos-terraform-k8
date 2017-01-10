@@ -9,6 +9,17 @@ resource "aws_autoscaling_group" "master" {
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.master.name}"
 
+  tag {
+    key                 = "Name"
+    value               = "master-${var.cluster_name}"
+    propagate_at_launch = "true"
+  }
+  tag {
+    key                 = "apptype"
+    value               = "k8-master"
+    propagate_at_launch = "true"
+  }
+
   lifecycle {
     create_before_destroy = true
   }

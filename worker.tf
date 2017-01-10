@@ -9,6 +9,18 @@ resource "aws_autoscaling_group" "worker" {
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.worker.name}"
 
+  tag {
+    key                 = "Name"
+    value               = "worker-${var.cluster_name}"
+    propagate_at_launch = "true"
+  }
+  tag {
+    key                 = "apptype"
+    value               = "k8-worker"
+    propagate_at_launch = "true"
+  }
+
+
   lifecycle {
     create_before_destroy = true
   }
