@@ -115,7 +115,7 @@ write-files:
           - --master=http://127.0.0.1:8080
           - --service-account-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem
           - --root-ca-file=/etc/kubernetes/ssl/ca.pem
-          # - --cluster-name=${CLUSTER_NAME}
+          # - --cluster-name=$CLUSTER_NAME
           - --cloud-provider=aws
           livenessProbe:
             httpGet:
