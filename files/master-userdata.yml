@@ -15,6 +15,15 @@ write-files:
           sleep 1 && echo .;
         done;
       exit $?
+  - path: /tmp/certsetup.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      curl -o /tmp/ca.pem  https://${region}.s3.amazonaws.com/ca.pem
+      curl -o /tmp/kubernetes-key.pem  https://${region}.s3.amazonaws.com/kubernetes-key.pem
+      curl -o /tmp/kubernetes.pem  https://${region}.s3.amazonaws.com/kubernetes.pem
+      mkdir -p /etc/kubernetes/ssl/
+      mv *.pem /etc/kubernetes/ssl/
   - path: /tmp/set-info.sh
     permissions: '0755'
     content: |
@@ -232,6 +241,13 @@ write-files:
 
 coreos:
   units:
+  - name: set-cert.service
+    content: |
+      [Unit]
+      Description=Set k8 certs
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/bin/bash -c /tmp/certsetup.sh
   - name: flanneld.service
     command: start
     drop-ins:

@@ -14,6 +14,8 @@ resource "template_file" "master-user-data" {
     SERVICE_IP_RANGE = "${var.service_ip_range}"
     API_SECURE_PORT = "${var.api_secure_port}"
     DNS_SERVICE_IP = "${var.dns_service_ip}"
+    S3_BUCKET = "${var.s3_bucket}"
+    region = "${var.region}"
   }
 
 }
