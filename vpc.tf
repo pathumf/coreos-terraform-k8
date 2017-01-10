@@ -20,9 +20,9 @@ resource "aws_subnet" "k8-master-subnet" {
 
  resource "aws_subnet" "k8-etcd-subnet-zone01" {
    vpc_id ="${aws_vpc.k8-vpc.id}"
-   cidr_block="${var.cidr_block_etcd}"
+   cidr_block="${var.cidr_block_etcd_zone01}"
    map_public_ip_on_launch = false
-   availability_zone = "${var.az_etcd_zone1}"
+   availability_zone = "${var.az_zone1}"
    tags {
      name = "k8-etcd-${var.cluster_name}-subnet"
    }
@@ -30,9 +30,9 @@ resource "aws_subnet" "k8-master-subnet" {
 
 resource "aws_subnet" "k8-etcd-subnet-zone02" {
   vpc_id ="${aws_vpc.k8-vpc.id}"
-  cidr_block="${var.cidr_block_etcd}"
+  cidr_block="${var.cidr_block_etcd_zone02}"
   map_public_ip_on_launch = false
-  availability_zone = "${var.az_etcd_zone2}"
+  availability_zone = "${var.az_zone2}"
   tags {
     name = "k8-etcd-${var.cluster_name}-subnet"
   }
@@ -42,7 +42,7 @@ resource "aws_subnet" "k8-worker-subnet-zone01" {
   vpc_id = "${aws_vpc.k8-vpc.id}"
   cidr_block ="${var.cidr_block_worker_zone01}"
   map_public_ip_on_launch = false
-  availability_zone = "${var.az_worker_zone01}"
+  availability_zone = "${var.az_zone1}"
   tags {
     name = "k8-worker-${var.cluster_name}-subnet-zone01"
   }
@@ -52,7 +52,7 @@ resource "aws_subnet" "k8-worker-subnet-zone02" {
   vpc_id = "${aws_vpc.k8-vpc.id}"
   cidr_block ="${var.cidr_block_worker_zone02}"
   map_public_ip_on_launch = false
-  availability_zone = "${var.az_worker_zone02}"
+  availability_zone = "${var.az_zone2}"
   tags {
     name = "k8-worker-${var.cluster_name}-subnet-zone02"
   }

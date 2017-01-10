@@ -16,21 +16,19 @@ variable "cidr_block_master" {
 variable "az_master_zone" {
   default = "eu-central-1a"
 }
-variable "cidr_block_etcd" {
-  default = "10.0.2.0/24"
+variable "cidr_block_etcd_zone01" {
+  default = "10.0.2.0/29"
+}
+variable "cidr_block_etcd_zone02" {
+  default = "10.0.2.8/29"
 }
 variable "cidr_block_worker_zone01" {
-  default = "10.0.3.0/24"
+  default = "10.0.3.0/26"
 }
 variable "cidr_block_worker_zone02" {
-  default = "10.0.4.0/24"
+  default = "10.0.3.64/26"
 }
-variable "az_worker_zone01" {
-  default = "10.0.5.0/24"
-}
-variable "az_worker_zone02" {
-  default = "10.0.6.0/24"
-}
+
 variable "az_count" {
   default = "2"
 }
@@ -63,10 +61,10 @@ variable "worker_node_count" {
 variable "worker_ins_type" {
   default = "t2.micro"
 }
-variable "az_etcd_zone1" {
+variable "az_zone1" {
   default = "eu-central-1a"
 }
-variable "az_etcd_zone2" {
+variable "az_zone2" {
   default = "eu-central-1b"
 }
 variable "key_name" {
