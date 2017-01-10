@@ -99,22 +99,22 @@ resource "aws_route" "k8-backend_default" {
 
 resource "aws_route_table_association" "backend-etcd-01" {
   subnet_id = "${aws_subnet.k8-etcd-subnet-zone01.id}"
-  route_table_id = "${aws_route.k8-backend.id}"
+  route_table_id = "${aws_route_table.k8-backend.id}"
   }
 
 resource "aws_route_table_association" "backend-etcd-02" {
   subnet_id = "${aws_subnet.k8-etcd-subnet-zone02.id}"
-  route_table_id = "${aws_route.k8-backend.id}"
+  route_table_id = "${aws_route_table.k8-backend.id}"
   }
 
 resource "aws_route_table_association" "backend-worker-01" {
   subnet_id = "${aws_subnet.k8-worker-subnet-zone01.id}"
-  route_table_id = "${aws_route.k8-backend.id}"
+  route_table_id = "${aws_route_table.k8-backend.id}"
 }
 
 resource "aws_route_table_association" "backend-worker-02" {
   subnet_id = "${aws_subnet.k8-worker-subnet-zone02.id}"
-  route_table_id = "${aws_route.k8-backend.id}"
+  route_table_id = "${aws_route_table.k8-backend.id}"
 }
 
 resource "aws_security_group" "k8-security-group-master" {
