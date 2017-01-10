@@ -85,3 +85,6 @@ variable "api_secure_port" {
 variable "dns_service_ip" {
   default = "10.5.0.10"
 }
+variable "s3_bucket" {
+  default = "k8tlsbackect"
+}
