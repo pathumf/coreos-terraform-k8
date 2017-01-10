@@ -6,6 +6,7 @@ write-files:
       FLANNELD_IFACE=$private_ipv4
       FLANNELD_ETCD_ENDPOINTS=${FLANNELD_ETCD_ENDPOINTS}
   - path: /opt/bin/wupiao
+    owner: "root"
     permissions: '0755'
     content: |
       #!/bin/bash
@@ -16,6 +17,7 @@ write-files:
         done;
       exit $?
   - path: /tmp/certsetup.sh
+    owner: "root"
     permissions: '0755'
     content: |
       #!/bin/bash
@@ -25,12 +27,14 @@ write-files:
       mkdir -p /etc/kubernetes/ssl/
       mv *.pem /etc/kubernetes/ssl/
   - path: /tmp/set-info.sh
+    owner: "root"
     permissions: '0755'
     content: |
       #!/bin/bash
       echo PRIVATE_IP=$COREOS_PRIVATE_IPV4 >> /etc/kubernetes.env
       echo PUBLIC_IP=$COREOS_PUBLIC_IPV4 >> /etc/kubernetes.env
   - path: /tmp/master.sh
+    owner: "root"
     permission: '0755'
     content: |
       #!/bin/bash
