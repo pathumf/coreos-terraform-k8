@@ -21,7 +21,7 @@ write-files:
     permissions: '0755'
     content: |
       #!/bin/bash
-      curl -o /tmp/ca.pem  https://${S3_BUKCET}.s3.amazonaws.com/ca.pem
+      curl -o /tmp/ca.pem  https://${S3_BUCKET}.s3.amazonaws.com/ca.pem
       curl -o /tmp/kubernetes-key.pem  https://${S3_BUCKET}.s3.amazonaws.com/kubernetes-key.pem
       curl -o /tmp/kubernetes.pem  https://${S3_BUCKET}.s3.amazonaws.com/kubernetes.pem
       mkdir -p /etc/kubernetes/ssl/
