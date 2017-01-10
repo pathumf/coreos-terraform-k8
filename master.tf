@@ -29,3 +29,58 @@ resource "aws_launch_configuration" "master" {
     create_before_destroy = true
   }
 }
+
+#master loadbalancer
+resource "aws_elb" "master-elb" {
+  name = "k8-master-elb-${var.cluster_name}"
+
+  # The same availability zone as our instances
+  availability_zones = ["${split(",", var.az_list_all)}"]
+  internal = "true"
+
+  listener {
+    instance_port     = 8080
+    instance_protocol = "http"
+    lb_port           = 8080
+    lb_protocol       = "http"
+  }
+
+  listener {
+    instance_port     = 443
+    instance_protocol = "http"
+    lb_port           = 443
+    lb_protocol       = "http"
+  }
+
+  listener {
+    instance_port     = 10249
+    instance_protocol = "tcp"
+    lb_port           = 10249
+    lb_protocol       = "tcp"
+  }
+
+  listener {
+    instance_port     = 10251
+    instance_protocol = "tcp"
+    lb_port           = 10251
+    lb_protocol       = "tcp"
+  }
+
+  listener {
+    instance_port     = 10252
+    instance_protocol = "tcp"
+    lb_port           = 10252
+    lb_protocol       = "tcp"
+  }
+
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "TCP:8080"
+    interval            = 30
+  }
+
+}
+
