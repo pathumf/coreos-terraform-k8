@@ -17,10 +17,10 @@ variable "az_master_zone" {
   default = "eu-central-1a"
 }
 variable "cidr_block_etcd_zone01" {
-  default = "10.0.2.0/29"
+  default = "10.0.2.0/26"
 }
 variable "cidr_block_etcd_zone02" {
-  default = "10.0.2.8/29"
+  default = "10.0.2.64/26"
 }
 variable "cidr_block_worker_zone01" {
   default = "10.0.3.0/26"
@@ -68,7 +68,7 @@ variable "az_zone2" {
   default = "eu-central-1b"
 }
 variable "key_name" {
-  default="bitesize"
+  default="etcd-key"
 }
 
 variable "kubernetes_version" {
