@@ -1,1 +1,1 @@
-https://discovery.etcd.io/84a9f4b7ca39b84427972cfb9a7ee022
+https://discovery.etcd.io/11ca29e33f22464e96eeb10daaa94ee7

@@ -68,7 +68,7 @@ variable "az_zone2" {
   default = "eu-central-1b"
 }
 variable "key_name" {
-  default="BiteSize"
+  default="bitesize"
 }
 
 variable "kubernetes_version" {
