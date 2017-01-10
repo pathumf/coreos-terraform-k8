@@ -9,7 +9,18 @@ resource "aws_autoscaling_group" "etcd" {
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.etcd.name}"
   load_balancers            = ["${aws_elb.etcd-elb.name}"]
-  
+
+  tag {
+    key                 = "Name"
+    value               = "etcd-${var.cluster_name}"
+    propagate_at_launch = "true"
+  }
+  tag {
+    key                 = "apptype"
+    value               = "k8-etcd"
+    propagate_at_launch = "true"
+  }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -63,4 +74,3 @@ resource "aws_elb" "etcd-elb" {
   }
 
 }
-
