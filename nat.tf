@@ -13,16 +13,10 @@ resource "aws_instance" "nat" {
    delete_on_termination = true
  }
 
- tag {
-   key                 = "Name"
-   value               = "nat-${var.cluster_name}"
-   propagate_at_launch = "true"
- }
- tag {
-   key                 = "apptype"
-   value               = "k8-net"
-   propagate_at_launch = "true"
- }
+ tags {
+     name = "nat-${var.cluster_name}"
+    }
+
 }
 
 /* Elastic IPs*/
