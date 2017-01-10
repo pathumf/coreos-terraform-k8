@@ -42,6 +42,15 @@ resource "aws_iam_role_policy" "master" {
         {
             "Effect": "Allow",
             "Action": [
+                "s3:*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${var.s3_bucket}"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
                 "elasticloadbalancing:*"
             ],
             "Resource": [
@@ -49,6 +58,8 @@ resource "aws_iam_role_policy" "master" {
             ]
         }
     ]
+
+    
 }
 EOF
 }
