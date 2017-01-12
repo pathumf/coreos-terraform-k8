@@ -17,6 +17,7 @@ resource "template_file" "master-user-data" {
     API_SECURE_PORT = "${var.api_secure_port}"
     DNS_SERVICE_IP = "${var.dns_service_ip}"
     S3_BUCKET = "${var.s3_bucket}"
+    K8S_VER = "${var.kubelet_version}"
     region = "${var.region}"
   }
 
