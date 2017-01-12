@@ -89,6 +89,6 @@ variable "s3_bucket" {
 variable "pod_network" {
     default = "10.2.0.0/16"
 }
-variable "KUBELET_VERSION" {
+variable "kubelet_version" {
     default = "v1.5.1_coreos.0"
 }
