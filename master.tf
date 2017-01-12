@@ -32,7 +32,8 @@ resource "aws_launch_configuration" "master" {
   instance_type        = "${var.master_ins_type}"
   key_name             = "${var.key_name}"
   security_groups      = ["${aws_security_group.k8-security-group-master.id}"]
-  user_data            = "${file("${path.module}/files/master-userdata.yml")}"
+#  user_data            = "${file("${path.module}/files/master-userdata.yml")}"
+  user_data            = "${template_file.master-user-data.rendered}"
   iam_instance_profile = "${aws_iam_instance_profile.master.id}"
 
 

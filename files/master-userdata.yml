@@ -35,7 +35,7 @@ write-files:
 
   - path: "/etc/profile.env"
     content: |
-      export K8S_VER=v1.5.1_coreos.0
+      export KUBELET_VERSION=v1.5.1_coreos.0
 
   - path: "/etc/kubernetes/manifests/kube-apiserver.yaml"
     owner: "root"
@@ -161,7 +161,7 @@ coreos:
         --container-runtime=docker \
         --allow-privileged=true \
         --pod-manifest-path=/etc/kubernetes/manifests \
-        --hostname-override=${ADVERTISE_IP} \
+        --hostname-override=$ADVERTISE_IP \
         --cluster_dns=${DNS_SERVICE_IP} \
         --cluster_domain=cluster.local
       ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
