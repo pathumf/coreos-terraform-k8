@@ -144,6 +144,7 @@ coreos:
     content: |
       [Service]
       Environment=KUBELET_VERSION=${K8S_VER}
+      Environment=ADVERTISE_IP=$private_ipv4
       Environment="RKT_OPTS=--uuid-file-save=/var/run/kubelet-pod.uuid \
         --volume var-log,kind=host,source=/var/log \
         --mount volume=var-log,target=/var/log \
