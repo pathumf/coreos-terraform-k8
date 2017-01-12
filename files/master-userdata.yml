@@ -33,6 +33,10 @@ write-files:
       curl -o /etc/kubernetes/ssl/apiserver-key.pem  https://k8tlsbackect.s3.amazonaws.com/kubernetes-key.pem
       curl -o /etc/kubernetes/ssl/apiserver.pem  https://k8tlsbackect.s3.amazonaws.com/kubernetes.pem
 
+  - path: "/etc/profile.env"
+    content: |
+      export K8S_VER=v1.5.1_coreos.0
+
   - path: "/etc/kubernetes/manifests/kube-apiserver.yaml"
     owner: "root"
     content: |
