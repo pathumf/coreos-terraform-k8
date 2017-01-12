@@ -119,11 +119,7 @@ coreos:
 
       - name: "50-network-config.conf"
         content: |
-          [Unit]
-          Requires=etcd2.service
-          After=etcd2.service
           [Service]
-          ExecStartPre=/opt/bin/wupiao http://127.0.0.1:2379/v2/members
           ExecStartPre=/usr/bin/etcdctl --no-sync set /coreos.com/network/config '{ "Network": "${KUBERNETES_CONTAINERS_CIDR}", "Backend":{"Type": "vxlan"} }'
           [Install]
           WantedBy=multi-user.target
