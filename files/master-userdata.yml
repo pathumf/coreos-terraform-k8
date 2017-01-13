@@ -3,7 +3,6 @@ write-files:
   - path: "/etc/flannel/options.env"
     owner: "root"
     content: |
-      FLANNELD_IFACE=$private_ipv4
       FLANNELD_ETCD_ENDPOINTS=${FLANNELD_ETCD_ENDPOINTS}
 
   - path: "/etc/kubernetes/cni/docker_opts_cni.env"
@@ -36,6 +35,8 @@ write-files:
   - path: "/etc/profile.env"
     content: |
       export KUBELET_VERSION=v1.5.1_coreos.0
+      export FLANNELD_IFACE=$private_ipv4
+      export FLANNELD_ETCD_ENDPOINTS=${FLANNELD_ETCD_ENDPOINTS}
 
   - path: "/etc/kubernetes/manifests/kube-apiserver.yaml"
     owner: "root"
@@ -120,9 +121,8 @@ coreos:
       - name: "50-network-config.conf"
         content: |
           [Service]
-          ExecStartPre=/usr/bin/etcdctl --no-sync set /coreos.com/network/config '{ "Network": "${KUBERNETES_CONTAINERS_CIDR}", "Backend":{"Type": "vxlan"} }'
-          [Install]
-          WantedBy=multi-user.target
+          ExecStartPre=/usr/bin/etcdctl --endpoints ${FLANNELD_ETCD_ENDPOINTS} \
+          set /coreos.com/network/config '{ "Network": "${KUBERNETES_CONTAINERS_CIDR}" }'
 
   - name: docker.service
     command: start
@@ -166,5 +166,7 @@ coreos:
 
       [Install]
       WantedBy=multi-user.target
+  flannel:
+        etcd_endpoints: "${FLANNELD_ETCD_ENDPOINTS}"
   update:
     reboot-strategy: "off"
