@@ -17,6 +17,25 @@ resource "aws_security_group_rule" "master-worker" {
 
 }
 
+resource "aws_security_group_rule" "master-elb" {
+ type = "ingress"
+ from_port = 0
+ to_port = 0
+ protocol = "-1"
+ source_security_group_id = "${aws_security_group.elb_sg.id}"
+ security_group_id = "${aws_security_group.k8-security-group-master.id}"
+}
+
+resource "aws_security_group_rule" "master-own" {
+ type = "ingress"
+ from_port = 0
+ to_port = 0
+ protocol = "-1"
+ source_security_group_id = "${aws_security_group.k8-security-group-master.id}"
+ security_group_id = "${aws_security_group.k8-security-group-master.id}"
+}
+
+
 resource "aws_security_group_rule" "etcd-master" {
  type = "ingress"
  from_port = 0
@@ -35,6 +54,24 @@ resource "aws_security_group_rule" "etcd-worker" {
  security_group_id = "${aws_security_group.k8-security-group-etcd.id}"
 
 }
+resource "aws_security_group_rule" "etcd-elb" {
+ type = "ingress"
+ from_port = 0
+ to_port = 0
+ protocol = "-1"
+ source_security_group_id = "${aws_security_group.elb_sg.id}"
+ security_group_id = "${aws_security_group.k8-security-group-etcd.id}"
+}
+
+resource "aws_security_group_rule" "etcd-own" {
+ type = "ingress"
+ from_port = 0
+ to_port = 0
+ protocol = "-1"
+ source_security_group_id = "${aws_security_group.k8-security-group-etcd.id}"
+ security_group_id = "${aws_security_group.k8-security-group-etcd.id}"
+}
+
 
 resource "aws_security_group_rule" "worker-master" {
  type = "ingress"
@@ -51,6 +88,15 @@ resource "aws_security_group_rule" "worker-etcd" {
  to_port = 0
  protocol = "-1"
  source_security_group_id = "${aws_security_group.k8-security-group-etcd.id}"
+ security_group_id = "${aws_security_group.k8-security-group-worker.id}"
+}
+
+resource "aws_security_group_rule" "worker-own" {
+ type = "ingress"
+ from_port = 0
+ to_port = 0
+ protocol = "-1"
+ source_security_group_id = "${aws_security_group.k8-security-group-worker.id}"
  security_group_id = "${aws_security_group.k8-security-group-worker.id}"
 }
 
