@@ -8,7 +8,7 @@ resource "aws_autoscaling_group" "master" {
   desired_capacity          = "${var.master_node_count}"
   force_delete              = false
   launch_configuration      = "${aws_launch_configuration.master.name}"
-
+  load_balancers            = ["${aws_elb.master-elb.name}"]
   tag {
     key                 = "Name"
     value               = "master-${var.cluster_name}"
@@ -53,38 +53,12 @@ resource "aws_launch_configuration" "master" {
     idle_timeout = 3600
     internal = "true"
 
-  listener {
-    instance_port     = 8080
-    instance_protocol = "http"
-    lb_port           = 8080
-    lb_protocol       = "http"
-  }
+
 
   listener {
     instance_port     = 443
-    instance_protocol = "http"
+    instance_protocol = "tcp"
     lb_port           = 443
-    lb_protocol       = "http"
-  }
-
-  listener {
-    instance_port     = 10249
-    instance_protocol = "tcp"
-    lb_port           = 10249
-    lb_protocol       = "tcp"
-  }
-
-  listener {
-    instance_port     = 10251
-    instance_protocol = "tcp"
-    lb_port           = 10251
-    lb_protocol       = "tcp"
-  }
-
-  listener {
-    instance_port     = 10252
-    instance_protocol = "tcp"
-    lb_port           = 10252
     lb_protocol       = "tcp"
   }
 
@@ -93,7 +67,7 @@ resource "aws_launch_configuration" "master" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "TCP:8080"
+    target              = "TCP:443"
     interval            = 30
   }
 
