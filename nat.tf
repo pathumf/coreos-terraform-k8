@@ -14,7 +14,7 @@ resource "aws_instance" "nat" {
  }
 
  tags {
-     name = "nat-${var.cluster_name}"
+     Name = "nat-${var.cluster_name}"
     }
 
 }
