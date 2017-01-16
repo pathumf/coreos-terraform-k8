@@ -43,12 +43,15 @@ resource "aws_launch_configuration" "master" {
 }
 
 #master loadbalancer
-resource "aws_elb" "master-elb" {
-  name = "k8-master-elb-${var.cluster_name}"
-  subnets = ["${aws_subnet.k8-etcd-subnet-zone01.id}","${aws_subnet.k8-etcd-subnet-zone02.id}"]
-  # The same availability zone as our instances
-  #availability_zones = ["${split(",", var.az_list_all)}"]
-  internal = "true"
+  resource "aws_elb" "master-elb" {
+    name = "k8-master-elb-${var.cluster_name}"
+  #  subnets = ["${aws_subnet.k8-etcd-subnet-zone01.id}","${aws_subnet.k8-etcd-subnet-zone02.id}"]
+    # The same availability zone as our instances
+    #availability_zones   = ["${split(",", var.availability_zones)}"]
+    subnets = ["${aws_subnet.k8-master-subnet.id}"]
+    security_groups = ["${aws_security_group.elb_sg.id}"]
+    idle_timeout = 3600
+    internal = "true"
 
   listener {
     instance_port     = 8080

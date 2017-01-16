@@ -1,0 +1,166 @@
+#cloud-config
+write-files:
+  - path: "/etc/flannel/options.env"
+    owner: "root"
+    content: |
+      FLANNELD_IFACE=$private_ipv4
+      FLANNELD_ETCD_ENDPOINTS=${FLANNELD_ETCD_ENDPOINTS}
+
+  - path: "/etc/kubernetes/cni/docker_opts_cni.env"
+    owner: "root"
+    content: |
+      DOCKER_OPT_BIP=""
+      DOCKER_OPT_IPMASQ=""
+
+  - path: "/etc/kubernetes/cni/net.d/10-flannel.conf"
+    owner: "root"
+    content: |
+      {
+        "name": "podnet",
+        "type": "flannel",
+        "delegate": {
+           "isDefaultGateway": true
+        }
+      }
+
+  - path: /tmp/certsetup.sh
+    owner: "root"
+    permissions: '0700'
+    content: |
+      #!/bin/bash
+      mkdir -p /etc/kubernetes/ssl/
+      curl -o /etc/kubernetes/ssl/ca.pem  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/ca.pem
+      curl -o /etc/kubernetes/ssl/worker-key.pem  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kubernetes-key.pem
+      curl -o /etc/kubernetes/ssl/worker.pem  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kubernetes.pem
+      curl -o /etc/kubernetes/manifests/kube-worker.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-proxy-worker.yaml
+      rm -rf /etc/kubernetes/worker-kubeconfig.yaml
+      curl -o /etc/kubernetes/worker-kubeconfig.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/worker-kubeconfig.yaml
+
+  - path: "/etc/profile.env"
+    content: |
+      export KUBELET_VERSION=v1.5.1_coreos.0
+      export FLANNELD_IFACE=$private_ipv4
+      export FLANNELD_ETCD_ENDPOINTS=${FLANNELD_ETCD_ENDPOINTS}
+      export FLANNEL_ETCD_KEY="/coreos.com/network"
+      export MASTER_ELB="${MASTER_ELB}"
+
+  - path: /opt/bin/wupiao
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      # [w]ait [u]ntil [p]ort [i]s [a]ctually [o]pen
+      [ -n "$1" ] && \
+        until curl -o /dev/null -sf $${1}; do \
+          sleep 1 && echo .;
+        done;
+      exit $?
+
+  - path: /etc/kubernetes/manifests/kube-proxy.yaml
+    permissions: '0755'
+    content: |
+      [Service]
+      Environment=KUBELET_VERSION=v1.5.1_coreos.0
+      Environment="RKT_OPTS=--uuid-file-save=/var/run/kubelet-pod.uuid \
+        --volume var-log,kind=host,source=/var/log \
+        --mount volume=var-log,target=/var/log \
+        --volume dns,kind=host,source=/etc/resolv.conf \
+        --mount volume=dns,target=/etc/resolv.conf"
+      ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
+      ExecStartPre=/usr/bin/mkdir -p /var/log/containers
+      ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid
+      ExecStart=/usr/lib/coreos/kubelet-wrapper \
+        --api-servers=https://master-kube-cluster.paas.cloud \
+        --cni-conf-dir=/etc/kubernetes/cni/net.d \
+        --network-plugin=cni \
+        --container-runtime=docker \
+        --register-node=true \
+        --allow-privileged=true \
+        --pod-manifest-path=/etc/kubernetes/manifests \
+        --hostname-override=worker-$private_ipv4.paas.cloud \
+        --cluster_dns=10.5.0.10 \
+        --cluster_domain=cluster.local \
+        --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
+        --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
+        --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem
+      ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
+      Restart=always
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+
+
+coreos:
+  units:
+  - name: flanneld.service
+    command: start
+    drop-ins:
+      - name: "40-ExecStartPre-symlink.conf"
+        content: |
+          [Service]
+          ExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env
+
+      - name: "50-network-config.conf"
+        content: |
+          [Service]
+          ExecStartPre=/usr/bin/etcdctl --endpoints ${FLANNELD_ETCD_ENDPOINTS} \
+          set /coreos.com/network/config '{ "Network": "${KUBERNETES_CONTAINERS_CIDR}","SubnetLen": 24, "Backend":{"Type": "vxlan" } }'
+
+  - name: docker.service
+    command: start
+    drop-ins:
+      - name: "40-flannel.conf"
+        content: |
+          [Unit]
+          Requires=flanneld.service
+          After=flanneld.service
+          [Service]
+          EnvironmentFile=/etc/kubernetes/cni/docker_opts_cni.env
+
+  - name: set-tls-info.service
+    command: start
+    content: |
+      [Unit]
+      Description=Get TLS information
+      [Service]
+      Type=oneshot
+      EnvironmentFile=/etc/profile.env
+      ExecStart=/usr/bin/bash -c /tmp/certsetup.sh
+
+  - name: kubelet.service
+    command: start
+    content: |
+      [Service]
+      Environment=KUBELET_VERSION=${K8S_VER}
+      Environment="RKT_OPTS=--uuid-file-save=/var/run/kubelet-pod.uuid \
+        --volume var-log,kind=host,source=/var/log \
+        --mount volume=var-log,target=/var/log \
+        --volume dns,kind=host,source=/etc/resolv.conf \
+        --mount volume=dns,target=/etc/resolv.conf"
+      ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
+      ExecStartPre=/usr/bin/mkdir -p /var/log/containers
+      ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid
+      ExecStart=/usr/lib/coreos/kubelet-wrapper \
+        --api-servers=https://${MASTER_ELB} \
+        --cni-conf-dir=/etc/kubernetes/cni/net.d \
+        --network-plugin=cni \
+        --container-runtime=docker \
+        --register-node=true \
+        --allow-privileged=true \
+        --pod-manifest-path=/etc/kubernetes/manifests \
+        --hostname-override=worker-$private_ipv4.paas.cloud \
+        --cluster_dns=${DNS_SERVICE_IP} \
+        --cluster_domain=cluster.local \
+        --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
+        --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
+        --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem
+      ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
+      Restart=always
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+  flannel:
+        etcd_endpoints: "${FLANNELD_ETCD_ENDPOINTS}"
+  update:
+    reboot-strategy: "off"

@@ -47,6 +47,8 @@ resource "aws_launch_configuration" "etcd" {
 resource "aws_elb" "etcd-elb" {
   name = "k8-etcd-elb-${var.cluster_name}"
   subnets = ["${aws_subnet.k8-etcd-subnet-zone01.id}","${aws_subnet.k8-etcd-subnet-zone02.id}"]
+  security_groups = ["${aws_security_group.elb_sg.id}"]
+  idle_timeout = 3600
   # The same availability zone as our instances
   #availability_zones = ["${split(",", var.az_list_all)}"]
   internal = "true"

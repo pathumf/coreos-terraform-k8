@@ -3,6 +3,7 @@ write-files:
   - path: "/etc/flannel/options.env"
     owner: "root"
     content: |
+      FLANNELD_IFACE=$private_ipv4
       FLANNELD_ETCD_ENDPOINTS=${FLANNELD_ETCD_ENDPOINTS}
 
   - path: "/etc/kubernetes/cni/docker_opts_cni.env"
@@ -24,19 +25,25 @@ write-files:
 
   - path: /tmp/certsetup.sh
     owner: "root"
-    permissions: '0600'
+    permissions: '0700'
     content: |
       #!/bin/bash
       mkdir -p /etc/kubernetes/ssl/
-      curl -o /etc/kubernetes/ssl/ca.pem  https://k8tlsbackect.s3.amazonaws.com/ca.pem
-      curl -o /etc/kubernetes/ssl/apiserver-key.pem  https://k8tlsbackect.s3.amazonaws.com/kubernetes-key.pem
-      curl -o /etc/kubernetes/ssl/apiserver.pem  https://k8tlsbackect.s3.amazonaws.com/kubernetes.pem
+      curl -o /etc/kubernetes/ssl/ca.pem  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/ca.pem
+      curl -o /etc/kubernetes/ssl/apiserver-key.pem  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kubernetes-key.pem
+      curl -o /etc/kubernetes/ssl/apiserver.pem  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kubernetes.pem
+      curl -o /etc/kubernetes/manifests/kube-proxy.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-proxy.yaml
+      curl -o /etc/kubernetes/manifests/kube-controller-manager.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-controller-manager.yaml
+      curl -o /etc/kubernetes/manifests/kube-scheduler.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-scheduler.yaml
+      curl -o /opt/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.5.1/bin/linux/amd64/kubectl
+      chmod +x /opt/kubectl
 
   - path: "/etc/profile.env"
     content: |
       export KUBELET_VERSION=v1.5.1_coreos.0
       export FLANNELD_IFACE=$private_ipv4
       export FLANNELD_ETCD_ENDPOINTS=${FLANNELD_ETCD_ENDPOINTS}
+      export FLANNEL_ETCD_KEY="/coreos.com/network"
 
   - path: "/etc/kubernetes/manifests/kube-apiserver.yaml"
     owner: "root"
@@ -122,7 +129,7 @@ coreos:
         content: |
           [Service]
           ExecStartPre=/usr/bin/etcdctl --endpoints ${FLANNELD_ETCD_ENDPOINTS} \
-          set /coreos.com/network/config '{ "Network": "${KUBERNETES_CONTAINERS_CIDR}" }'
+          set /coreos.com/network/config '{ "Network": "${KUBERNETES_CONTAINERS_CIDR}","SubnetLen": 24, "Backend":{"Type": "vxlan" } }'
 
   - name: docker.service
     command: start
@@ -135,9 +142,21 @@ coreos:
           [Service]
           EnvironmentFile=/etc/kubernetes/cni/docker_opts_cni.env
 
+  - name: set-tls-info.service
+    command: start
+    content: |
+      [Unit]
+      Description=Get TLS information
+      [Service]
+      Type=oneshot
+      EnvironmentFile=/etc/profile.env
+      ExecStart=/usr/bin/bash -c /tmp/certsetup.sh
+
   - name: kubelet.service
     command: start
     content: |
+      [Unit]
+      After=set-tls-info.service
       [Service]
       Environment=KUBELET_VERSION=${K8S_VER}
       Environment=ADVERTISE_IP=$private_ipv4
@@ -157,7 +176,7 @@ coreos:
         --container-runtime=docker \
         --allow-privileged=true \
         --pod-manifest-path=/etc/kubernetes/manifests \
-        --hostname-override=$ADVERTISE_IP \
+        --hostname-override=master-$private_ipv4.paas.cloud \
         --cluster_dns=${DNS_SERVICE_IP} \
         --cluster_domain=cluster.local
       ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid

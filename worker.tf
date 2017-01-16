@@ -33,7 +33,7 @@ resource "aws_launch_configuration" "worker" {
   instance_type        = "${var.worker_ins_type}"
   key_name             = "${var.key_name}"
   security_groups      = ["${aws_security_group.k8-security-group-worker.id}"]
-  user_data            = "${file("${path.module}/files/user-data-worker")}"
+  user_data            = "${template_file.worker-user-data.rendered}"
   iam_instance_profile = "${aws_iam_instance_profile.worker.id}"
 
 
