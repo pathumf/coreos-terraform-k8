@@ -29,7 +29,7 @@ resource "aws_autoscaling_group" "worker" {
 
 resource "aws_launch_configuration" "worker" {
   name                 = "k8-worker-lc-${var.cluster_name}"
-  image_id             = "${var.core_ami}"
+  image_id             = "${lookup(var.coreos_amis, var.region)}"
   instance_type        = "${var.worker_ins_type}"
   key_name             = "${var.key_name}"
   security_groups      = ["${aws_security_group.k8-security-group-worker.id}"]

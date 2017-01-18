@@ -1,3 +1,4 @@
+etcd_discovery_url.txt
 *.tfstate
 *.tfstate.backup
 *.swp

@@ -29,7 +29,7 @@ resource "aws_autoscaling_group" "etcd" {
 
 resource "aws_launch_configuration" "etcd" {
   name                 = "k8-etcd-lc-${var.cluster_name}"
-  image_id             = "${var.core_ami}"
+  image_id             = "${lookup(var.coreos_amis, var.region)}"
   instance_type        = "${var.etcd_ins_type}"
   key_name             = "${var.key_name}"
   security_groups      = ["${aws_security_group.k8-security-group-etcd.id}"]

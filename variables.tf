@@ -49,6 +49,16 @@ variable "etcd_ins_type" {
 variable "core_ami" {
   default = "ami-ed0ec882"
 }
+
+# CoreOS images for all regions
+variable "coreos_amis" {
+  default = {
+    "ap-northeast-1" = "ami-ce90f2a9"
+    "eu-central-1" = "ami-ed0ec882"
+    "eu-central-2" = "ami-11b14b7e"
+  }
+}
+
 variable "master_node_count" {
   default = "1"
 }

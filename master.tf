@@ -28,7 +28,7 @@ resource "aws_autoscaling_group" "master" {
 
 resource "aws_launch_configuration" "master" {
   name                 = "k8-master-lc-${var.cluster_name}"
-  image_id             = "${var.core_ami}"
+  image_id             = "${lookup(var.coreos_amis, var.region)}"
   instance_type        = "${var.master_ins_type}"
   key_name             = "${var.key_name}"
   security_groups      = ["${aws_security_group.k8-security-group-master.id}"]
