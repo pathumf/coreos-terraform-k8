@@ -1,8 +1,8 @@
 # coreos-terraform-k8
 
 ##Prerequisits
-Terraform 
-GNU Make
+- Terraform 
+- GNU Make
 
 #Export aws keys
 export AWS_ACCESS_KEY_ID='*yourkey*'
