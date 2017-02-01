@@ -36,7 +36,7 @@ variable "nat_ami" {
   default = "ami-0b322e67"
 }
 variable "nat_ins_type" {
-  default = "t2.micro"
+  default = "m3.medium"
 }
 variable "etcd_node_count" {
   default = "3"
@@ -53,13 +53,13 @@ variable "master_node_count" {
   default = "1"
 }
 variable "master_ins_type" {
-  default = "t2.micro"
+  default = "t2.large"
 }
 variable "worker_node_count" {
   default = "3"
 }
 variable "worker_ins_type" {
-  default = "t2.micro"
+  default = "t2.large"
 }
 variable "az_zone1" {
   default = "eu-central-1a"

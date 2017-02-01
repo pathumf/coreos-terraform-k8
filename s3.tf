@@ -57,3 +57,10 @@ resource "aws_s3_bucket_object" "k8-kubeconfig" {
     source = "data/config/worker-kubeconfig.yaml"
     acl = "public-read"
 }
+
+resource "aws_s3_bucket_object" "k8-skydns" {
+    bucket = "${aws_s3_bucket.s3-k8tlscert.id}"
+    key = "skydns.yaml"
+    source = "data/config/skydns.yaml"
+    acl = "public-read"
+}
