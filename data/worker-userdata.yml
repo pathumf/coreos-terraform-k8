@@ -76,7 +76,7 @@ write-files:
         --register-node=true \
         --allow-privileged=true \
         --pod-manifest-path=/etc/kubernetes/manifests \
-        --hostname-override=worker-$private_ipv4.paas.cloud \
+        --hostname-override=$HOSTNAME \
         --cluster_dns=10.5.0.10 \
         --cluster_domain=cluster.local \
         --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
@@ -148,7 +148,7 @@ coreos:
         --register-node=true \
         --allow-privileged=true \
         --pod-manifest-path=/etc/kubernetes/manifests \
-        --hostname-override=worker-$private_ipv4.paas.cloud \
+        --hostname-override=$HOSTNAME \
         --cluster_dns=${DNS_SERVICE_IP} \
         --cluster_domain=cluster.local \
         --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
