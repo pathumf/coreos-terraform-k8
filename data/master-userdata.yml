@@ -34,6 +34,7 @@ write-files:
       curl -o /etc/kubernetes/ssl/apiserver.pem  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kubernetes.pem
       curl -o /etc/kubernetes/manifests/kube-proxy.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-proxy.yaml
       curl -o /etc/kubernetes/manifests/kube-controller-manager.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-controller-manager.yaml
+      curl -o /etc/kubernetes/manifests/skydns.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/skydns.yaml
       curl -o /etc/kubernetes/manifests/kube-scheduler.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-scheduler.yaml
       curl -o /opt/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.5.1/bin/linux/amd64/kubectl
       chmod +x /opt/kubectl
@@ -176,7 +177,7 @@ coreos:
         --container-runtime=docker \
         --allow-privileged=true \
         --pod-manifest-path=/etc/kubernetes/manifests \
-        --hostname-override=master-$private_ipv4.paas.cloud \
+        --hostname-override=$HOSTNAME \
         --cluster_dns=${DNS_SERVICE_IP} \
         --cluster_domain=cluster.local
       ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
