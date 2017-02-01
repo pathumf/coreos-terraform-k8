@@ -98,7 +98,16 @@ resource "aws_iam_role_policy" "worker" {
         "ecr:BatchGetImage"
       ],
       "Resource": "*"
-    }
+    },
+     {
+       "Effect": "Allow",
+       "Action": [
+        "elasticloadbalancing:*"
+       ],
+       "Resource": [
+           "*"
+        ]
+     }
   ]
 }
 EOF

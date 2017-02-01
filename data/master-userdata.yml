@@ -177,7 +177,6 @@ coreos:
         --container-runtime=docker \
         --allow-privileged=true \
         --pod-manifest-path=/etc/kubernetes/manifests \
-        --hostname-override=$HOSTNAME \
         --cluster_dns=${DNS_SERVICE_IP} \
         --cluster_domain=cluster.local
       ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
