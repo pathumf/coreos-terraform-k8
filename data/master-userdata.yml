@@ -36,8 +36,17 @@ write-files:
       curl -o /etc/kubernetes/manifests/kube-controller-manager.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-controller-manager.yaml
       curl -o /etc/kubernetes/manifests/skydns.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/skydns.yaml
       curl -o /etc/kubernetes/manifests/kube-scheduler.yaml  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/kube-scheduler.yaml
-      curl -o /opt/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.5.1/bin/linux/amd64/kubectl
-      chmod +x /opt/kubectl
+      curl -o /opt/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.5.1/bin/linux/amd64/kubectl
+      chmod +x /opt/bin/kubectl
+
+ - path: /tmp/elksetup.sh
+    owner: "root"
+    permissions: '0700'
+    content: |
+      #!/bin/bash
+      mkdir -p /etc/kubernetes/addons/
+      curl -o /tmp/elk-5.1.2.tgz  https://${S3_BUCKET}.s3.${aws_region}.amazonaws.com/elk-5.1.2.tgz
+      tar -zxvf /tmp/elk-5.1.2.tgz -C /etc/kubernetes/addons/
 
   - path: "/etc/profile.env"
     content: |
@@ -186,6 +195,16 @@ coreos:
 
       [Install]
       WantedBy=multi-user.target
+
+  - name: elksetup.service
+    command: start
+    content: |
+      [Unit]
+      Description=resources for elk cluster
+      [Service]
+      Type=oneshot
+      EnvironmentFile=/etc/profile.env
+      ExecStart=/usr/bin/bash -c /tmp/elksetup.sh
   flannel:
         etcd_endpoints: "${FLANNELD_ETCD_ENDPOINTS}"
   update:

@@ -64,3 +64,11 @@ resource "aws_s3_bucket_object" "k8-skydns" {
     source = "data/config/skydns.yaml"
     acl = "public-read"
 }
+
+resource "aws_s3_bucket_object" "k8-elk" {
+    bucket = "${aws_s3_bucket.s3-k8tlscert.id}"
+    key = "elk-5.1.2.tgz"
+    source = "data/config/elk-5.1.2.tgz"
+    acl = "public-read"
+}
+
